@@ -15,7 +15,6 @@ struct train
 	char dest[SIZE];
 	my_time time;
 	train* next;
-	train* prev;
 };
 
 using namespace std;
@@ -45,7 +44,6 @@ train* create()
 {
 	train* first = new train;
 	first = get_info();
-	first->prev = NULL;
 	first->next = NULL;
 	return first;
 }
@@ -56,7 +54,6 @@ train* add(train* previous)
 	train* to_next = previous->next;// запомнили следующий элемент
 	previous->next = current;//указали (предыдущий->вперед) на текущий
 	current->next = to_next;//указали (текущий->вперед) на следующий (взяли выше)
-	current->prev = previous;//указали (текущий->назад) на предыдущий
 	return current;
 }
 
