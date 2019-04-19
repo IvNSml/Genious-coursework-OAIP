@@ -19,24 +19,24 @@ struct train
 };
 
 using namespace std;
-//Функции для манипуляций с поездами
-train* create();//возврат адреса корня
-train* add(train* previous);//возврат адреса добавленного
-train* get_info();//ввод в отдельной функции, для удобства отладки
-int show(train* root, int number);// для выдачи информации по номеру поезда
-int show(train* root, char dest[]);// для выдачи информации по станции
+//Р¤СѓРЅРєС†РёРё РґР»СЏ РјР°РЅРёРїСѓР»СЏС†РёР№ СЃ РїРѕРµР·РґР°РјРё
+train* create();//РІРѕР·РІСЂР°С‚ Р°РґСЂРµСЃР° РєРѕСЂРЅСЏ
+train* add(train* previous);//РІРѕР·РІСЂР°С‚ Р°РґСЂРµСЃР° РґРѕР±Р°РІР»РµРЅРЅРѕРіРѕ
+train* get_info();//РІРІРѕРґ РІ РѕС‚РґРµР»СЊРЅРѕР№ С„СѓРЅРєС†РёРё, РґР»СЏ СѓРґРѕР±СЃС‚РІР° РѕС‚Р»Р°РґРєРё
+int show(train* root, int number);// РґР»СЏ РІС‹РґР°С‡Рё РёРЅС„РѕСЂРјР°С†РёРё РїРѕ РЅРѕРјРµСЂСѓ РїРѕРµР·РґР°
+int show(train* root, char dest[]);// РґР»СЏ РІС‹РґР°С‡Рё РёРЅС„РѕСЂРјР°С†РёРё РїРѕ СЃС‚Р°РЅС†РёРё
 int show_all(train* root);
 
 train* get_info()
 {
 	train* current = new train;
-	cout << "Введите номер поезда: ";
+	cout << "Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ РїРѕРµР·РґР°: ";
 	cin >> current->number;
-	cout << "Введите пункт назначения: ";
+	cout << "Р’РІРµРґРёС‚Рµ РїСѓРЅРєС‚ РЅР°Р·РЅР°С‡РµРЅРёСЏ: ";
 	cin >> current->dest;
-	cout << "Введите время; Часы: ";
+	cout << "Р’РІРµРґРёС‚Рµ РІСЂРµРјСЏ; Р§Р°СЃС‹: ";
 	cin >> current->time.hours;
-	cout << "Введите время; Минуты: ";
+	cout << "Р’РІРµРґРёС‚Рµ РІСЂРµРјСЏ; РњРёРЅСѓС‚С‹: ";
 	cin >> current->time.minutes;
 	return current;
 }
@@ -53,28 +53,28 @@ train* add(train* previous)
 {
 	train* current = new train;
 	current = get_info();
-	train* to_next = previous->next;// запомнили следующий элемент
-	previous->next = current;//указали (предыдущий->вперед) на текущий
-	current->next = to_next;//указали (текущий->вперед) на следующий (взяли выше)
-	current->prev = previous;//указали (текущий->назад) на предыдущий
+	train* to_next = previous->next;// Р·Р°РїРѕРјРЅРёР»Рё СЃР»РµРґСѓСЋС‰РёР№ СЌР»РµРјРµРЅС‚
+	previous->next = current;//СѓРєР°Р·Р°Р»Рё (РїСЂРµРґС‹РґСѓС‰РёР№->РІРїРµСЂРµРґ) РЅР° С‚РµРєСѓС‰РёР№
+	current->next = to_next;//СѓРєР°Р·Р°Р»Рё (С‚РµРєСѓС‰РёР№->РІРїРµСЂРµРґ) РЅР° СЃР»РµРґСѓСЋС‰РёР№ (РІР·СЏР»Рё РІС‹С€Рµ)
+	current->prev = previous;//СѓРєР°Р·Р°Р»Рё (С‚РµРєСѓС‰РёР№->РЅР°Р·Р°Рґ) РЅР° РїСЂРµРґС‹РґСѓС‰РёР№
 	return current;
 }
 
 int show(train* root, int number)
 {
 	train* element = root;
-	while (element->number != number)//пока не найдем
+	while (element->number != number)//РїРѕРєР° РЅРµ РЅР°Р№РґРµРј
 	{
 		element = element->next;
 		if (element==NULL)
 		{
-			cout << "Нет такого поезда!\n" << endl;
+			cout << "РќРµС‚ С‚Р°РєРѕРіРѕ РїРѕРµР·РґР°!\n" << endl;
 			return 0;
 		}
 	}
-	cout << "Номер поезда: " << element->number << endl;
-	cout << "Направление: " << element->dest << endl;
-	cout << "Время отправления: " << element->time.hours << ':' << element->time.minutes << endl;
+	cout << "РќРѕРјРµСЂ РїРѕРµР·РґР°: " << element->number << endl;
+	cout << "РќР°РїСЂР°РІР»РµРЅРёРµ: " << element->dest << endl;
+	cout << "Р’СЂРµРјСЏ РѕС‚РїСЂР°РІР»РµРЅРёСЏ: " << element->time.hours << ':' << element->time.minutes << endl;
 	return 0;
 }
 
@@ -83,20 +83,20 @@ int show(train* root, char dest[])
 	setlocale(LC_ALL, "Russian");
 	train* element = root;
 	bool free = true;
-	while (element)//пока не NULL
+	while (element)//РїРѕРєР° РЅРµ NULL
 	{
 		if (strcmp(dest,element->dest)==0)
 		{
 			free = false;
-			cout << "Номер поезда: " << element->number << endl;
-			cout << "Направление: " << element->dest << endl;
-			cout << "Время отправления: " << element->time.hours << ':' << element->time.minutes << endl;
+			cout << "РќРѕРјРµСЂ РїРѕРµР·РґР°: " << element->number << endl;
+			cout << "РќР°РїСЂР°РІР»РµРЅРёРµ: " << element->dest << endl;
+			cout << "Р’СЂРµРјСЏ РѕС‚РїСЂР°РІР»РµРЅРёСЏ: " << element->time.hours << ':' << element->time.minutes << endl;
 		}
 		element = element->next;
 	}
 	if (free)
 	{
-		cout << "Нет поездов по данному направлению\n";
+		cout << "РќРµС‚ РїРѕРµР·РґРѕРІ РїРѕ РґР°РЅРЅРѕРјСѓ РЅР°РїСЂР°РІР»РµРЅРёСЋ\n";
 	}
 	return 0;
 }
@@ -105,9 +105,9 @@ int show_all(train* root)
 	train* current = root;
 	while(current)
 	{
-		cout << "Номер поезда: " << current->number << endl;
-		cout << "Направление: " << current->dest << endl;
-		cout << "Время отправления: " << current->time.hours << ':' << current->time.minutes << endl;
+		cout << "РќРѕРјРµСЂ РїРѕРµР·РґР°: " << current->number << endl;
+		cout << "РќР°РїСЂР°РІР»РµРЅРёРµ: " << current->dest << endl;
+		cout << "Р’СЂРµРјСЏ РѕС‚РїСЂР°РІР»РµРЅРёСЏ: " << current->time.hours << ':' << current->time.minutes << endl;
 		current = current->next;
 	}
 	return 0;
@@ -119,18 +119,18 @@ int main()
 	setlocale(LC_ALL, "Russian");
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
-	train* previous = NULL;//это к add(), указатель на предыдущий элемент списка
+	train* previous = NULL;//СЌС‚Рѕ Рє add(), СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїСЂРµРґС‹РґСѓС‰РёР№ СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР°
 	train* first = NULL;
-	train* current = NULL; // это к add(),компилятор не дает их объявить в switch-case, потому они здесь
-	bool is_first = true;//является ли первым элементом
-label://метка возврата к меню
+	train* current = NULL; // СЌС‚Рѕ Рє add(),РєРѕРјРїРёР»СЏС‚РѕСЂ РЅРµ РґР°РµС‚ РёС… РѕР±СЉСЏРІРёС‚СЊ РІ switch-case, РїРѕС‚РѕРјСѓ РѕРЅРё Р·РґРµСЃСЊ
+	bool is_first = true;//СЏРІР»СЏРµС‚СЃСЏ Р»Рё РїРµСЂРІС‹Рј СЌР»РµРјРµРЅС‚РѕРј
+label://РјРµС‚РєР° РІРѕР·РІСЂР°С‚Р° Рє РјРµРЅСЋ
 	cout << "--------------------------------------------------------------------------------" << setw(45);
-	cout << "МЕНЮ ПРОГРАММЫ" << endl;
+	cout << "РњР•РќР® РџР РћР“Р РђРњРњР«" << endl;
 	cout << "--------------------------------------------------------------------------------";
-	cout << "Выберите нужное действие:" << endl;
-	cout << "Добавить поезд (a)" << endl << "Вывести список поездов (v)" << endl <<
-		"Вывести информацию о поезде (i)" << endl << "Вывести информацию о поездах до станции (s)" << endl << "Выйти из программы (q)" << endl <<
-		"Ответ: ";
+	cout << "Р’С‹Р±РµСЂРёС‚Рµ РЅСѓР¶РЅРѕРµ РґРµР№СЃС‚РІРёРµ:" << endl;
+	cout << "Р”РѕР±Р°РІРёС‚СЊ РїРѕРµР·Рґ (a)" << endl << "Р’С‹РІРµСЃС‚Рё СЃРїРёСЃРѕРє РїРѕРµР·РґРѕРІ (v)" << endl <<
+		"Р’С‹РІРµСЃС‚Рё РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РїРѕРµР·РґРµ (i)" << endl << "Р’С‹РІРµСЃС‚Рё РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РїРѕРµР·РґР°С… РґРѕ СЃС‚Р°РЅС†РёРё (s)" << endl << "Р’С‹Р№С‚Рё РёР· РїСЂРѕРіСЂР°РјРјС‹ (q)" << endl <<
+		"РћС‚РІРµС‚: ";
 	char command;
 	cin >> command;
 	switch (command)
@@ -153,21 +153,21 @@ label://метка возврата к меню
 		break;
 	case 'v':
 		if (is_first) {
-			cout << "Ни одного поезда не добавлено\n";
+			cout << "РќРё РѕРґРЅРѕРіРѕ РїРѕРµР·РґР° РЅРµ РґРѕР±Р°РІР»РµРЅРѕ\n";
 			break;
 		}
 		show_all(first);
 		break;
 
 	case 'i':
-		cout << "Номер поезда: ";
+		cout << "РќРѕРјРµСЂ РїРѕРµР·РґР°: ";
 		int number;
 		cin >> number;
 		show(first, number);
 		break;
 
 	case 's':
-		cout << "Название станции: ";
+		cout << "РќР°Р·РІР°РЅРёРµ СЃС‚Р°РЅС†РёРё: ";
 		char station[SIZE];
 		cin >> station;
 		show(first, station);
@@ -177,7 +177,7 @@ label://метка возврата к меню
 	return 0;
 	
 	default:
-		cout << "Неверная операция\n";
+		cout << "РќРµРІРµСЂРЅР°СЏ РѕРїРµСЂР°С†РёСЏ\n";
 		break;
 	}
 	goto label;
