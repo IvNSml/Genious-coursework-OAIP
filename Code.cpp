@@ -2,7 +2,10 @@
 #include <iomanip>
 #include<clocale>
 #include<windows.h>
-#define SIZE 10
+#include<fstream>
+#include <string>
+#define SIZE 30
+
 
 struct my_time
 {
@@ -13,32 +16,79 @@ struct train
 {
 	int number;
 	char dest[SIZE];
-	my_time time;
+	my_time* time;
 	train* next;
 };
 
 using namespace std;
-//Р¤СѓРЅРєС†РёРё РґР»СЏ РјР°РЅРёРїСѓР»СЏС†РёР№ СЃ РїРѕРµР·РґР°РјРё
-train* create();//РІРѕР·РІСЂР°С‚ Р°РґСЂРµСЃР° РєРѕСЂРЅСЏ
-train* add(train* previous);//РІРѕР·РІСЂР°С‚ Р°РґСЂРµСЃР° РґРѕР±Р°РІР»РµРЅРЅРѕРіРѕ
-train* get_info();//РІРІРѕРґ РІ РѕС‚РґРµР»СЊРЅРѕР№ С„СѓРЅРєС†РёРё, РґР»СЏ СѓРґРѕР±СЃС‚РІР° РѕС‚Р»Р°РґРєРё
-int show(train* root, int number);// РґР»СЏ РІС‹РґР°С‡Рё РёРЅС„РѕСЂРјР°С†РёРё РїРѕ РЅРѕРјРµСЂСѓ РїРѕРµР·РґР°
-int show(train* root, char dest[]);// РґР»СЏ РІС‹РґР°С‡Рё РёРЅС„РѕСЂРјР°С†РёРё РїРѕ СЃС‚Р°РЅС†РёРё
-int show_all(train* root);
+//Функции для манипуляций с поездами
+train* create();//возврат адреса корня
+train* add(train* previous);//возврат адреса добавленного
+train* get_info();//ввод в отдельной функции, для удобства отладки
+my_time* time();//ввод времени с проверкой
+int show(train* root, int number);// для выдачи информации по номеру поезда
+int show(train* root, char dest[]);// для выдачи информации по станции
+int show_all(train* root);// используем чтение из файла для быстрой выдачи целого списка
+int write_file(train* record);
 
 train* get_info()
 {
+ErrorLabel:
 	train* current = new train;
-	cout << "Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ РїРѕРµР·РґР°: ";
-	cin >> current->number;
-	cout << "Р’РІРµРґРёС‚Рµ РїСѓРЅРєС‚ РЅР°Р·РЅР°С‡РµРЅРёСЏ: ";
-	cin >> current->dest;
-	cout << "Р’РІРµРґРёС‚Рµ РІСЂРµРјСЏ; Р§Р°СЃС‹: ";
-	cin >> current->time.hours;
-	cout << "Р’РІРµРґРёС‚Рµ РІСЂРµРјСЏ; РњРёРЅСѓС‚С‹: ";
-	cin >> current->time.minutes;
+	try {
+		cout << "Введите номер поезда: ";
+		cin >> current->number;
+		cin.ignore(1000,'\n');
+		cout << "Введите пункт назначения: ";
+		cin >> current->dest;
+		if (!cin || current->dest == '\0')
+		{
+			throw "Ошибка типа данных!\n";
+		}
+		cin.ignore(1000, '\n');
+		current->time = time();
+	}
+	catch(const char* TypeError)
+	{
+		system("cls");
+		cin.clear();
+		cin.ignore(1000, '\n');
+		cout << TypeError << endl;
+		delete current;
+		goto ErrorLabel;
+	}
 	return current;
 }
+my_time* time() {
+	my_time* now = new my_time;
+		while (true) {
+			cout << "Введите время: Часы: ";
+			cin >> now->hours;
+			if (now->hours >= 24 || now->hours < 0 || now->hours == '\0')
+			{
+				cout << "Ошибка! Введите верное время!\n";
+				system("pause");
+				system("cls");
+				cin.clear();
+				cin.ignore(1000, '\n');
+				continue;
+			}
+			cout << "Введите время: Минуты: ";
+			cin >> now->minutes;
+			if (now->minutes > 59 || now->minutes < 0 || now->minutes == '\0')
+			{
+				cout << "Ошибка! Введите верное время!\n";
+				system("pause");
+				system("cls");
+				cin.clear();
+				cin.ignore(1000, '\n');
+				continue;
+			}
+			break;
+		}
+		return now;
+}
+	
 
 train* create()
 {
@@ -51,27 +101,27 @@ train* add(train* previous)
 {
 	train* current = new train;
 	current = get_info();
-	train* to_next = previous->next;// Р·Р°РїРѕРјРЅРёР»Рё СЃР»РµРґСѓСЋС‰РёР№ СЌР»РµРјРµРЅС‚
-	previous->next = current;//СѓРєР°Р·Р°Р»Рё (РїСЂРµРґС‹РґСѓС‰РёР№->РІРїРµСЂРµРґ) РЅР° С‚РµРєСѓС‰РёР№
-	current->next = to_next;//СѓРєР°Р·Р°Р»Рё (С‚РµРєСѓС‰РёР№->РІРїРµСЂРµРґ) РЅР° СЃР»РµРґСѓСЋС‰РёР№ (РІР·СЏР»Рё РІС‹С€Рµ)
+	train* to_next = previous->next;// запомнили следующий элемент
+	previous->next = current;//указали (предыдущий->вперед) на текущий
+	current->next = to_next;//указали (текущий->вперед) на следующий (взяли выше)
 	return current;
 }
 
 int show(train* root, int number)
 {
 	train* element = root;
-	while (element->number != number)//РїРѕРєР° РЅРµ РЅР°Р№РґРµРј
+	while (element->number != number)//пока не найдем
 	{
 		element = element->next;
 		if (element==NULL)
 		{
-			cout << "РќРµС‚ С‚Р°РєРѕРіРѕ РїРѕРµР·РґР°!\n" << endl;
+			cout << "Нет такого поезда!\n" << endl;
 			return 0;
 		}
 	}
-	cout << "РќРѕРјРµСЂ РїРѕРµР·РґР°: " << element->number << endl;
-	cout << "РќР°РїСЂР°РІР»РµРЅРёРµ: " << element->dest << endl;
-	cout << "Р’СЂРµРјСЏ РѕС‚РїСЂР°РІР»РµРЅРёСЏ: " << element->time.hours << ':' << element->time.minutes << endl;
+	cout << "Номер поезда: " << element->number << endl;
+	cout << "Направление: " << element->dest << endl;
+	cout << "Время отправления: " << element->time->hours << ':' << element->time->minutes << endl;
 	return 0;
 }
 
@@ -80,33 +130,65 @@ int show(train* root, char dest[])
 	setlocale(LC_ALL, "Russian");
 	train* element = root;
 	bool free = true;
-	while (element)//РїРѕРєР° РЅРµ NULL
+	while (element)//пока не NULL
 	{
 		if (strcmp(dest,element->dest)==0)
 		{
 			free = false;
-			cout << "РќРѕРјРµСЂ РїРѕРµР·РґР°: " << element->number << endl;
-			cout << "РќР°РїСЂР°РІР»РµРЅРёРµ: " << element->dest << endl;
-			cout << "Р’СЂРµРјСЏ РѕС‚РїСЂР°РІР»РµРЅРёСЏ: " << element->time.hours << ':' << element->time.minutes << endl;
+			cout << "Номер поезда: " << element->number << endl;
+			cout << "Направление: " << element->dest << endl;
+			cout << "Время отправления: " << element->time->hours << ':' << element->time->minutes << endl;
 		}
-		element = element->next;
-	}
+		element = element->next;	
+	}	
 	if (free)
 	{
-		cout << "РќРµС‚ РїРѕРµР·РґРѕРІ РїРѕ РґР°РЅРЅРѕРјСѓ РЅР°РїСЂР°РІР»РµРЅРёСЋ\n";
+		cout << "Нет поездов по данному направлению\n";
 	}
 	return 0;
 }
 int show_all(train* root)
 {
-	train* current = root;
-	while(current)
+	train* current = new train;
+	ifstream file;
+	string buff;
+	file.open("file.bin", ios::binary);
+	if (!file.is_open())
 	{
-		cout << "РќРѕРјРµСЂ РїРѕРµР·РґР°: " << current->number << endl;
-		cout << "РќР°РїСЂР°РІР»РµРЅРёРµ: " << current->dest << endl;
-		cout << "Р’СЂРµРјСЏ РѕС‚РїСЂР°РІР»РµРЅРёСЏ: " << current->time.hours << ':' << current->time.minutes << endl;
-		current = current->next;
+		cout << "Невозможно открыть файл!" << endl;
+		return -1;
 	}
+	getline(file, buff);
+	while(!file.eof())
+	{
+		getline(file,buff);
+		cout << "Номер поезда: " << buff << endl;
+		getline(file, buff);
+		cout << "Направление: " << buff << endl;
+		getline(file, buff);
+		cout << "Время отправления: " << buff;
+		getline(file, buff);
+		cout << ':' << buff <<endl;
+	}
+	file.close();
+	return 0;
+}
+
+int write_file(train* currrent)
+{
+	ofstream file;
+	file.open("file.bin", ios::binary | ios::app);
+	if(!file.is_open())
+	{
+		cout << "Невозможно открыть файл!" << endl;
+		return -1;
+	}
+	file << endl;
+	file << currrent->number<<endl;
+	file << currrent->dest << endl;
+	file << currrent->time->hours<<endl;
+	file << currrent->time->minutes;
+	file.close();
 	return 0;
 }
 
@@ -116,23 +198,26 @@ int main()
 	setlocale(LC_ALL, "Russian");
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
-	train* previous = NULL;//СЌС‚Рѕ Рє add(), СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РїСЂРµРґС‹РґСѓС‰РёР№ СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР°
+	train* previous = NULL;//это к add(), указатель на предыдущий элемент списка
 	train* first = NULL;
-	train* current = NULL; // СЌС‚Рѕ Рє add(),РєРѕРјРїРёР»СЏС‚РѕСЂ РЅРµ РґР°РµС‚ РёС… РѕР±СЉСЏРІРёС‚СЊ РІ switch-case, РїРѕС‚РѕРјСѓ РѕРЅРё Р·РґРµСЃСЊ
-	bool is_first = true;//СЏРІР»СЏРµС‚СЃСЏ Р»Рё РїРµСЂРІС‹Рј СЌР»РµРјРµРЅС‚РѕРј
-label://РјРµС‚РєР° РІРѕР·РІСЂР°С‚Р° Рє РјРµРЅСЋ
+	train* current = NULL; // это к add(),компилятор не дает их объявить в switch-case, потому они здесь
+	bool is_first = true;//является ли первым элементом
+label://метка возврата к меню
 	cout << "--------------------------------------------------------------------------------" << setw(45);
-	cout << "РњР•РќР® РџР РћР“Р РђРњРњР«" << endl;
+	cout << "МЕНЮ ПРОГРАММЫ" << endl;
 	cout << "--------------------------------------------------------------------------------";
-	cout << "Р’С‹Р±РµСЂРёС‚Рµ РЅСѓР¶РЅРѕРµ РґРµР№СЃС‚РІРёРµ:" << endl;
-	cout << "Р”РѕР±Р°РІРёС‚СЊ РїРѕРµР·Рґ (a)" << endl << "Р’С‹РІРµСЃС‚Рё СЃРїРёСЃРѕРє РїРѕРµР·РґРѕРІ (v)" << endl <<
-		"Р’С‹РІРµСЃС‚Рё РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РїРѕРµР·РґРµ (i)" << endl << "Р’С‹РІРµСЃС‚Рё РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РїРѕРµР·РґР°С… РґРѕ СЃС‚Р°РЅС†РёРё (s)" << endl << "Р’С‹Р№С‚Рё РёР· РїСЂРѕРіСЂР°РјРјС‹ (q)" << endl <<
-		"РћС‚РІРµС‚: ";
+	cout << "Выберите нужное действие:" << endl;
+	cout << "Добавить поезд (a)" << endl << "Вывести список поездов (v)" << endl <<
+		"Вывести информацию о поезде (i)" << endl << "Вывести информацию о поездах до станции (s)" << endl << "Выйти из программы (q)" << endl <<
+		"Ответ: ";
 	char command;
 	cin >> command;
+	cin.ignore(1000, '\n');
+	system("cls");
 	switch (command)
 	{
 	case 'a':
+		system("cls");
 		if (is_first) {
 			first = create();
 			previous = first;
@@ -143,39 +228,59 @@ label://РјРµС‚РєР° РІРѕР·РІСЂР°С‚Р° Рє РјРµРЅСЋ
 			current = add(previous);
 			previous = current;
 		}
-		if (!current ||!previous)
-		{
-			goto label;
-		}
+		write_file(previous);
+		system("cls");
+		cout<<"Поезд создан!\n";
 		break;
 	case 'v':
 		if (is_first) {
-			cout << "РќРё РѕРґРЅРѕРіРѕ РїРѕРµР·РґР° РЅРµ РґРѕР±Р°РІР»РµРЅРѕ\n";
+			cout << "Ни одного поезда не добавлено\n";
 			break;
 		}
 		show_all(first);
 		break;
 
 	case 'i':
-		cout << "РќРѕРјРµСЂ РїРѕРµР·РґР°: ";
+		if (is_first) {
+			cout << "Ни одного поезда не добавлено\n";
+			break;
+		}
 		int number;
+		cout << "Номер поезда: ";
 		cin >> number;
+		if (cin.fail()) {
+			cout << "Неверный тип данных!\n";
+			cin.clear();
+			cin.ignore(1000, '\n');
+			break;
+		}
+		system("cls");
 		show(first, number);
 		break;
 
 	case 's':
-		cout << "РќР°Р·РІР°РЅРёРµ СЃС‚Р°РЅС†РёРё: ";
+		if (is_first) {
+			cout << "Ни одного поезда не добавлено\n";
+			break;
+		}
+		cout << "Название станции: ";
 		char station[SIZE];
 		cin >> station;
+		system("cls");
 		show(first, station);
 		break;
 	
 	case 'q':
-	return 0;
+		if (remove("file.bin") != 0)
+			std::cout << "Ошибка удаления файла\n";
+		return 0;
 	
 	default:
-		cout << "РќРµРІРµСЂРЅР°СЏ РѕРїРµСЂР°С†РёСЏ\n";
+		cout << "Неверная операция\n";
 		break;
 	}
+	cout << endl;
+	system("pause");
+	system("cls");
 	goto label;
 }
