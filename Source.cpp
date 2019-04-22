@@ -32,7 +32,7 @@ int main()
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 	bool first = true;
-	stack* example;
+	stack* example = NULL;
 	stack** top = &example;//верхний элемент указывает на NULL: больше элементов нет
 	setlocale(LC_ALL, "Russian");
 	char sentance[SIZE];
@@ -41,7 +41,7 @@ int main()
 	const char* psent = sentance;
 	while(*(psent-1))//из-за инкремента, указатель стоит на следующем за '\0' элементе
 	{	
-		while (*psent != ' '&& *psent)
+		while (*psent != ' '&&  *psent)
 		{
 			push(top, *psent, &first);
 			psent++;
